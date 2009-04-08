@@ -6,11 +6,11 @@ Requires at least: 2.7
 Tested up to: 2.7.1
 Stable tag: 0.3
 
-a wordpress plugin that will automatically post an update to [ping.fm]: http://www.ping.fm/ (ping.fm) for every publish.
+a wordpress plugin that will automatically post an update to ping.fm for every publish.
 
 == Description ==
 
-a wordpress plugin that will automatically post an update to [ping.fm]: http://www.ping.fm/ (ping.fm) for every publish.
+a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
 
 == Installation ==
 
