@@ -1,4 +1,5 @@
 === Plugin Name ===
+Contributors: silentwind
 Donate link: http://example.com/
 Tags: publish, ping.fm
 Requires at least: 2.7
@@ -15,11 +16,13 @@ a wordpress plugin that will automatically post an update to [ping.fm]: http://w
 
 1. Upload `cr-post2pingfm` directory to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Go to Settings &raquo; CR Post2Pingfm and fill in your Ping.fm [Application Key]: http://ping.fm/key/ (Ping.fm Application Key)
+1. Go to Settings » CR Post2Pingfm and fill in your Ping.fm [Application Key]: http://ping.fm/key/ (Ping.fm Application Key)
 
 == Frequently Asked Questions ==
+
+=Question 1=
+...No question at the moment.
 
 == Screenshots ==
 
 1. This is where you fill in the Application Key
-
