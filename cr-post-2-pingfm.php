@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: CR Post to Ping.fm
-Plugin URI: http://bayu.freelancer.web.id/
+Plugin URI: http://bayu.freelancer.web.id/2009/03/31/wordpress-plugin-cr-post2pingfm/
 Description: This plugin will submit your new post to ping.fm account.
 Version: 0.2
 Author: Arief Bayu Purwanto
