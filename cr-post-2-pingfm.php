@@ -32,6 +32,7 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
             foreach($theCats as $cats)
             {
                 $categories[] = $cats->cat_ID;
+                $categories[] = $cats->category_nicename;
             }
             $continue = isCategoriesAllowedToPing($postId, $categories);
         }
@@ -77,7 +78,7 @@ eg: <em>I just post {title} on {url}</em></td>
     <input type="radio" name="cl_post_pingfm_ping_mode" value="all" <?php if(get_option('cl_post_pingfm_ping_mode') == "all") { echo 'checked="checked"'; }?> />For all categories (<em>all</em>)<br />
     <input type="radio" name="cl_post_pingfm_ping_mode" value="allow" <?php if(get_option('cl_post_pingfm_ping_mode') == "allow") { echo 'checked="checked"'; }?> />For this categories (<em>allow</em>)<br />
     <input type="radio" name="cl_post_pingfm_ping_mode" value="deny" <?php if(get_option('cl_post_pingfm_ping_mode') == "deny") { echo 'checked="checked"'; }?> />For categories except this one (<em>deny</em>)<br />
-    Category list<input type="text" name="cl_post_pingfm_ping_mode_category" value="<?php echo get_option('cl_post_pingfm_ping_mode_category'); ?>" />(comma separated, eg: <em>1,23,55,10</em>)<br />
+    Category list (<em>category ID and slug is supported</em>)<input type="text" name="cl_post_pingfm_ping_mode_category" value="<?php echo get_option('cl_post_pingfm_ping_mode_category'); ?>" />(comma separated, eg: <em>1,23,random-caregory,10,rants</em>)<br />
     Category list is ignored if mode <em>all</em> is selected.
 </td>
 </tr>
