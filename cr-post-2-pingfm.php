@@ -18,12 +18,21 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
 {
     $continue = false;
     $categories = array();
+    $postMode = get_option('cl_post_pingfm_publish_mode');
+
     if(!wp_is_post_revision($postId))
     {
         $this_post_submitted = get_option('cr_post_2_pingfm_submit_post_submitted_'.$postId, false);
         if(!$this_post_submitted)
         {
             $continue = true;
+        }
+        else
+        {
+            if("all" == $postMode)
+            {
+                $continue = true;
+            }
         }
 
         if($continue)
@@ -83,10 +92,18 @@ eg: <em>I just post {title} on {url}</em></td>
 </td>
 </tr>
 
+<tr valign="top">
+<th score="row">Publish Mode</th>
+<td>
+    Allow submit to ping.fm on the following condition: <br />
+    <input type="radio" name="cl_post_pingfm_publish_mode" value="once" <?php if(get_option('cl_post_pingfm_publish_mode') == "once") { echo 'checked="checked"'; }?> />Only submit for the first time (<em>once</em>)<br />
+    <input type="radio" name="cl_post_pingfm_publish_mode" value="all" <?php if(get_option('cl_post_pingfm_publish_mode') == "all") { echo 'checked="checked"'; }?> />For every <strong>publish</strong>(<em>all</em>)<br />
+</td>
+</tr>
 </table>
 
 <input type="hidden" name="action" value="update" />
-<input type="hidden" name="page_options" value="cl_post_pingfm_message_template,cl_post_pingfm_api_key,cl_post_pingfm_ping_mode_category,cl_post_pingfm_ping_mode" />
+<input type="hidden" name="page_options" value="cl_post_pingfm_message_template,cl_post_pingfm_api_key,cl_post_pingfm_ping_mode_category,cl_post_pingfm_ping_mode,cl_post_pingfm_publish_mode" />
 
 <p class="submit">
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
