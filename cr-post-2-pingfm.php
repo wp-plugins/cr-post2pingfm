@@ -93,10 +93,10 @@ eg: <em>I just post {title} on {url}</em></td>
 </tr>
 
 <tr valign="top">
-<th score="row">Publish Mode</th>
+<th score="row">Publish mode</th>
 <td>
     Allow submit to ping.fm on the following condition: <br />
-    <input type="radio" name="cl_post_pingfm_publish_mode" value="once" <?php if(get_option('cl_post_pingfm_publish_mode') == "once") { echo 'checked="checked"'; }?> />Only submit for the first time (<em>once</em>)<br />
+    <input type="radio" name="cl_post_pingfm_publish_mode" value="once" <?php if(get_option('cl_post_pingfm_publish_mode') == "once") { echo 'checked="checked"'; }?> />Only submit for the <strong>first time</strong>(<em>once</em>)<br />
     <input type="radio" name="cl_post_pingfm_publish_mode" value="all" <?php if(get_option('cl_post_pingfm_publish_mode') == "all") { echo 'checked="checked"'; }?> />For every <strong>publish</strong>(<em>all</em>)<br />
 </td>
 </tr>
