@@ -4,7 +4,7 @@ Donate link: http://bayu.freelancer.web.id/about/
 Tags: publish, ping.fm
 Requires at least: 2.7
 Tested up to: 2.7.1
-Stable tag: 0.6
+Stable tag: 0.7
 
 a wordpress plugin that will automatically post an update to ping.fm for every publish.
 
