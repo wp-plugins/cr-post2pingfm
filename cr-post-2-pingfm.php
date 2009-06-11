@@ -135,10 +135,14 @@ function submitPingFM($postId, $republish = false)
     $ping_template = get_option('cl_post_pingfm_message_template');
     $cl_post_pingfm_republish_template = get_option('cl_post_pingfm_republish_template');
 
-    if("this" == $cl_post_pingfm_republish_template)
+    if($republish)
     {
-        $ping_template = get_option('cl_post_pingfm_ping_republish_template_text');
+        if("this" == $cl_post_pingfm_republish_template)
+        {
+            $ping_template = get_option('cl_post_pingfm_ping_republish_template_text');
+        }
     }
+    
 
     $pfm = new PHPingFM(API_KEY, $my_API_key, false);
     $arrTemplate = array(
