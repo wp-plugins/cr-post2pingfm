@@ -3,11 +3,11 @@
 Plugin Name: CR Post to Ping.fm
 Plugin URI: http://bayu.freelancer.web.id/2009/03/31/wordpress-plugin-cr-post2pingfm/
 Description: This plugin will submit your new post to ping.fm account.
-Version: 0.7
+Version: 0.8
 Author: Arief Bayu Purwanto
 Author URI: http://bayu.freelancer.web.id/
 
- */
+*/
 
 define('API_KEY', '41121eb3a56f921bc2957b2458d65bad');
 
@@ -78,7 +78,18 @@ function cr_post_2_pingfm_submit_config_form() {
 
 <tr valign="top">
 <th scope="row">Ping Template</th>
-<td><input type="text" size="45" name="cl_post_pingfm_message_template" value="<?php echo get_option('cl_post_pingfm_message_template', 'I just post {title} on {url}'); ?>" /><br />
+<td>
+<input type="text" size="45" name="cl_post_pingfm_message_template_1" value="<?php echo get_option('cl_post_pingfm_message_template_1', 'I just post {title} on {url}'); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_2" value="<?php echo get_option('cl_post_pingfm_message_template_2', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_3" value="<?php echo get_option('cl_post_pingfm_message_template_3', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_4" value="<?php echo get_option('cl_post_pingfm_message_template_4', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_5" value="<?php echo get_option('cl_post_pingfm_message_template_5', 'New blog post {title} here: {url}'); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_6" value="<?php echo get_option('cl_post_pingfm_message_template_6', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_7" value="<?php echo get_option('cl_post_pingfm_message_template_7', 'Check out new post about {title} {url} here'); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_8" value="<?php echo get_option('cl_post_pingfm_message_template_8', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_9" value="<?php echo get_option('cl_post_pingfm_message_template_9', ''); ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_10" value="<?php echo get_option('cl_post_pingfm_message_template_10', ''); ?>" /><br />
+
 Template Tags: <strong>{title}</strong> for <em>Post Title</em> and <strong>{url}</strong> for <em>Permalink URL</em> <br />
 eg: <em>I just post {title} on {url}</em></td>
 </tr>
@@ -117,7 +128,10 @@ eg: <em>I just post {title} on {url}</em></td>
 </table>
 
 <input type="hidden" name="action" value="update" />
-<input type="hidden" name="page_options" value="cl_post_pingfm_message_template,cl_post_pingfm_api_key,cl_post_pingfm_ping_mode_category,cl_post_pingfm_ping_mode,cl_post_pingfm_publish_mode,cl_post_pingfm_ping_republish_template_text,cl_post_pingfm_republish_template" />
+<input type="hidden" name="page_options" value="cl_post_pingfm_message_template,cl_post_pingfm_api_key,cl_post_pingfm_ping_mode_category,
+cl_post_pingfm_ping_mode,cl_post_pingfm_publish_mode,cl_post_pingfm_ping_republish_template_text,cl_post_pingfm_republish_template,
+cl_post_pingfm_message_template_1,cl_post_pingfm_message_template_2,cl_post_pingfm_message_template_3,cl_post_pingfm_message_template_4,cl_post_pingfm_message_template_5,
+cl_post_pingfm_message_template_6,cl_post_pingfm_message_template_7,cl_post_pingfm_message_template_8,cl_post_pingfm_message_template_9,cl_post_pingfm_message_template_10" />
 
 <p class="submit">
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -132,7 +146,7 @@ function submitPingFM($postId, $republish = false)
     $post = get_post($postId);
     include_once('PHPingFM.php');
     $my_API_key = get_option('cl_post_pingfm_api_key');
-    $ping_template = get_option('cl_post_pingfm_message_template');
+    $ping_template = getPingTemplate();
     $cl_post_pingfm_republish_template = get_option('cl_post_pingfm_republish_template');
 
     if($republish)
@@ -154,6 +168,7 @@ function submitPingFM($postId, $republish = false)
     {
         $ping_template = str_replace($template, $template_data, $ping_template);
     }
+    
     $result = $pfm->post("status", $ping_template);
 }
 
@@ -189,6 +204,21 @@ function isCategoriesAllowedToPing($postId, $categories)
     {
         return true;
     }
+}
+
+function getPingTemplate(){
+	$template = array();
+	
+	for($i = 1; $i <=10; $i++){
+		$x = trim(get_option('cl_post_pingfm_message_template_' . $i, ''));
+		if($x){
+			$template[] = $x;
+		}
+	}
+	
+	//print_r($template);
+	
+	return $template[ rand(0, count($template) - 1 ) ];
 }
 
 
