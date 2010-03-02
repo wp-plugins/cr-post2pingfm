@@ -3,7 +3,7 @@
 Plugin Name: CR Post to Ping.fm
 Plugin URI: http://bayu.freelancer.web.id/2009/03/31/wordpress-plugin-cr-post2pingfm/
 Description: This plugin will submit your new post to ping.fm account.
-Version: 0.8
+Version: 0.9
 Author: Arief Bayu Purwanto
 Author URI: http://bayu.freelancer.web.id/
 
@@ -13,6 +13,39 @@ define('API_KEY', '41121eb3a56f921bc2957b2458d65bad');
 
 add_action('publish_post', 'cr_post_2_pingfm_submit_to_ping_fm');
 add_action('admin_menu', 'cr_post_2_pingfm_submit_config_admin');
+add_action('save_post', 'cr_post_2_pingfm_save_postdata');
+
+//add_action('admin_menu', 'cr_flexible_comment_moderation_add_custom_box');
+//add_action('save_post', 'cr_flexible_comment_moderation_save_postdata');
+
+function cr_post_2_pingfm_save_postdata( $post_id ) {
+	// verify this came from the our screen and with proper authorization,
+	// because save_post can be triggered at other times
+
+	if ( !wp_verify_nonce( $_POST['_cr_post_2_pingfm_custom_message_nonce'], plugin_basename(__FILE__) )) {
+		return $post_id;
+	}
+
+	if ( 'page' == $_POST['post_type'] ) {
+		if ( !current_user_can( 'edit_page', $post_id ))
+			return $post_id;
+	} else {
+		if ( !current_user_can( 'edit_post', $post_id ))
+			return $post_id;
+	}
+
+	// OK, we're authenticated: we need to find and save the data
+
+	$cr_p2pcm = $_POST['cr_post_2_pingfm_custom_message'];
+	if(!add_post_meta($post_id, "_cr_post_2_pingfm_custom_message", $cr_p2pcm, true))
+		update_post_meta($post_id, "_cr_post_2_pingfm_custom_message", $cr_p2pcm);
+
+	$cr_p2pcm_send_on_update = $_POST['cr_post_2_pingfm_custom_message_send_on_update'];
+	if(!add_post_meta($post_id, "_cr_post_2_pingfm_custom_message_send_on_update", $cr_p2pcm_send_on_update, true))
+		update_post_meta($post_id, "_cr_post_2_pingfm_custom_message_send_on_update", $cr_p2pcm_send_on_update);
+
+	return $post_id;
+}
 
 function cr_post_2_pingfm_submit_to_ping_fm($postId)
 {
@@ -59,7 +92,44 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
 
 function cr_post_2_pingfm_submit_config_admin()
 {
-    add_options_page('CR Post2Pingfm', 'CR Post2Pingfm', 8, __FILE__, 'cr_post_2_pingfm_submit_config_form');
+	add_options_page('CR Post2Pingfm', 'CR Post2Pingfm', 8, __FILE__, 'cr_post_2_pingfm_submit_config_form');
+	add_meta_box( 'cr_post_2_pingfm_custom_message_box', 'PingFM Message', 
+		'cr_post_2_pingfm_custom_message_box', 'post', 'side' );
+	add_meta_box( 'cr_post_2_pingfm_custom_message_box', 'PingFM Message', 
+		'cr_post_2_pingfm_custom_message_box', 'page', 'side' );
+}
+
+function cr_post_2_pingfm_custom_message_box() {
+
+	$post_id = mysql_escape_string($_GET['post']);
+
+	// The actual fields for data entry
+	$custom_message = get_post_meta( $post_id, '_cr_post_2_pingfm_custom_message', true);
+	$send_on_update = get_post_meta( $post_id, '_cr_post_2_pingfm_custom_message_send_on_update', true);
+	
+	echo '<input type="hidden" name="_cr_post_2_pingfm_custom_message_nonce" id="_cr_post_2_pingfm_custom_message_nonce" value="' . 
+	 wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	echo '<label for="cr_post_2_pingfm_custom_message">Custom Message:</label><br />';
+	echo '<input type="text"'
+		.' name="cr_post_2_pingfm_custom_message"'
+		.' value="' . $custom_message . '" />';
+	echo '<p><u><strong>Custom message</strong></u> is very useful if you
+want to set special update message to Ping.FM. If this field is empty,
+we will use setting provided on CR Post2PingFm setting page.<br />
+You can still use Template Tags: <strong>{title}</strong> for <em>Post Title</em>
+and <strong>{url}</strong> for <em>Permalink URL</em> <br />
+eg: <em>I just post {title} on {url}</em><br /></p>';
+/*	echo '<label for="cr_post_2_pingfm_custom_message_send_on_update">Send on update:</label><br />';
+  echo '<input type="radio"'
+  		.' name="cr_post_2_pingfm_custom_message_send_on_update"'
+  		. ($send_on_update == 'yes' ? ' checked="checked"' : '')
+		.' value="default" /> Yes, send please.<br />';
+  echo '<input type="radio"'
+  		.' name="cr_post_2_pingfm_custom_message_send_on_update"'
+  		. ($send_on_update == '' ? ' checked="checked"' : '')
+		.' value="overide" /> No, thanks.<br />';
+	echo '<p><u><strong>Send on update</strong></u> is used on updating post. By default, it is set to <strong>NO</strong>.</p>';*/
 }
 
 function cr_post_2_pingfm_submit_config_form() {
@@ -143,33 +213,36 @@ cl_post_pingfm_message_template_6,cl_post_pingfm_message_template_7,cl_post_ping
 
 function submitPingFM($postId, $republish = false)
 {
-    $post = get_post($postId);
-    include_once('PHPingFM.php');
-    $my_API_key = get_option('cl_post_pingfm_api_key');
-    $ping_template = getPingTemplate();
-    $cl_post_pingfm_republish_template = get_option('cl_post_pingfm_republish_template');
+	$post = get_post($postId);
+	include_once('PHPingFM.php');
+	$my_API_key = get_option('cl_post_pingfm_api_key');
+	$ping_template = get_post_meta( $postId, '_cr_post_2_pingfm_custom_message', true);
+	if(trim($ping_template) == ''){
+		$ping_template = getPingTemplate();
+	}
+	$cl_post_pingfm_republish_template = get_option('cl_post_pingfm_republish_template');
 
-    if($republish)
-    {
-        if("this" == $cl_post_pingfm_republish_template)
-        {
-            $ping_template = get_option('cl_post_pingfm_ping_republish_template_text');
-        }
-    }
-    
+	if($republish)
+	{
+		if("this" == $cl_post_pingfm_republish_template)
+		{
+			$ping_template = get_option('cl_post_pingfm_ping_republish_template_text');
+		}
+	}
 
-    $pfm = new PHPingFM(API_KEY, $my_API_key, false);
-    $arrTemplate = array(
-        '{title}' => $post->post_title,
-        '{url}' => get_permalink($postId),
-    );
 
-    foreach($arrTemplate as $template => $template_data)
-    {
-        $ping_template = str_replace($template, $template_data, $ping_template);
-    }
-    
-    $result = $pfm->post("status", $ping_template);
+	$pfm = new PHPingFM(API_KEY, $my_API_key, false);
+	$arrTemplate = array(
+		'{title}' => $post->post_title,
+		'{url}' => get_permalink($postId),
+	);
+
+	foreach($arrTemplate as $template => $template_data)
+	{
+		$ping_template = str_replace($template, $template_data, $ping_template);
+	}
+
+	$result = $pfm->post("status", $ping_template);
 }
 
 function isCategoriesAllowedToPing($postId, $categories)
