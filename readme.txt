@@ -4,13 +4,18 @@ Donate link: http://bayu.freelancer.web.id/about/
 Tags: publish, ping.fm
 Requires at least: 2.7
 Tested up to: 2.9.1
-Stable tag: 0.8
+Stable tag: 0.9
 
 a wordpress plugin that will automatically post an update to ping.fm for every publish.
 
 == Description ==
 
-a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
+**NEW FEATURE IN THIS RELEASE**
+
+1. You can now set custom ping message for each post. Just look at "PingFM Message" panel on "Add New" post page.
+1. Fix PingFM library, force it to use HTTP 1.0. To workaround invalid XML on some server.
+
+This is a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
 Features:
 
 1. Customizable ping message. Right now, there are 10 messages you can set. The plugin will choose randomly.
@@ -43,4 +48,5 @@ Maybe there's something wrong with your server configurations. Note: You need PH
 
 == Screenshots ==
 
-1. This is where you fill in the Application Key
+1. This is where you fill in the Application Key. Image courtesy of http://www.dragonblogger.com/
+2. This is where you set custome ping message. It's on post creation page.
