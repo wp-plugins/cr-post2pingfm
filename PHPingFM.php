@@ -98,7 +98,7 @@ class PHPingFM {
     }
     // Setup the cURL options.
     curl_setopt_array($this->ch, array(
-      CURLOPT_POSTFIELDS => $fields + array('user_app_key' => $this->user_app_key, 'api_key' => $this->api_key,
+      CURLOPT_POSTFIELDS => $fields + array('user_app_key' => $this->user_app_key, 'api_key' => $this->api_key),
       CURLOPT_URL => 'http://api.ping.fm/v1/'. $service,
     ));
     // Load the SimpleXML.
