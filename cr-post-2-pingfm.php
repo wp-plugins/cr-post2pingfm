@@ -9,7 +9,7 @@ Author URI: http://bayu.freelancer.web.id/
 
 */
 
-define('API_KEY', '41121eb3a56f921bc2957b2458d65bad');
+define('API_KEY', 'faec1ae02db39b8da9fd4a528e6b2006');
 
 add_action('publish_post', 'cr_post_2_pingfm_submit_to_ping_fm');
 add_action('admin_menu', 'cr_post_2_pingfm_submit_config_admin');
