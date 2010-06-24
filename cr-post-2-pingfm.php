@@ -1,23 +1,92 @@
 <?php
 /*
 Plugin Name: CR Post to Ping.fm
-Plugin URI: http://bayu.freelancer.web.id/2009/03/31/wordpress-plugin-cr-post2pingfm/
+Plugin URI: http://bayu.freelancer.web.id/oss/crpost2pingfm-plugin-to-submit-updates-to-ping-fm/
 Description: This plugin will submit your new post to ping.fm account.
-Version: 0.10
+Version: 1.0
 Author: Arief Bayu Purwanto
 Author URI: http://bayu.freelancer.web.id/
-
 */
 
 define('API_KEY', 'faec1ae02db39b8da9fd4a528e6b2006');
 
 add_action('publish_post', 'cr_post_2_pingfm_submit_to_ping_fm');
 add_action('admin_menu', 'cr_post_2_pingfm_submit_config_admin');
+
+add_action('edit_category_form_fields', 'cr_post_2_pingfm_edit_category_form_fields');
+add_action('edit_category', 'cr_post_2_pingfm_edit_category_save_action');
+
+add_action('init', 'cr_post_2_pingfm_init');
+function cr_post_2_pingfm_init(){
+    cr_post_2_pingfm_admin_warnings();
+}
+
+function cr_post_2_pingfm_admin_warnings(){
+	if ( !get_option('cl_post_pingfm_api_key') && !isset($_POST['submit']) ) {
+		function cr_post_2_pingfm_warning() {
+			echo "
+			<div id='crpost2pingfm-warning' class='updated fade'><p><strong>[CR]Post2PingFM is almost ready</strong> You must <a href='plugins.php?page=cr_post_2_pingfm_submit_config_form'>enter your Ping.FM API Key</a> for it to work.</p></div>
+			";
+		}
+		add_action('admin_notices', 'cr_post_2_pingfm_warning');
+		return;
+	}    
+}
+add_action('wp_ajax_cr_post_2_pingfm_ajax_test', 'cr_post_2_pingfm_ajax_test_handler');
+function cr_post_2_pingfm_ajax_test_handler(){
+    $method  = isset($_POST['method']) ? trim($_POST['method']) : '';
+    $message = isset($_POST['message']) ? trim($_POST['message']) : '';
+    
+    if(empty($message)){
+        echo "Message empty!";
+    }
+    
+    $user_key = trim(get_option('cl_post_pingfm_api_key'));
+    if('curl' == $method){
+        echo "Processing with CURL\n";
+        require_once('curl_submitter.php');
+        echo "cr_post2pingfm_do_submit_ping(".API_KEY.", $user_key, $message, true);\n";
+        $message = cr_post2pingfm_do_submit_ping(API_KEY, $user_key, $message, true);
+    } else if('fsockopen' == $method){
+        echo "Processing with FSockOpen\n";
+        require_once('fsockopen_submitter.php');
+        echo "cr_post2pingfm_do_submit_ping(".API_KEY.", $user_key, $message, true);\n";
+        $message = cr_post2pingfm_do_submit_ping(API_KEY, $user_key, $message, true);
+    }
+    
+    echo "<pre>".htmlentities($message)."</pre>";
+    exit;    
+}
+
+add_action('admin_head', 'cr_post_2_pingfm_js_admin');
+function cr_post_2_pingfm_js_admin(){
+?>
+<script type="text/javascript">
+function cr_post2pingfm_submit_testing(){
+    var data = {
+        action: 'cr_post_2_pingfm_ajax_test',
+        method: jQuery('#cr_ping_connection_method_selected')[0].value,
+        message: jQuery('#cr_ping_message')[0].value
+    };
+    jQuery.ajax({
+        type: 'post',
+        data: data,
+        url: ajaxurl,
+        success: function(data) {
+            document.getElementById('pingresult').innerHTML = data;
+            //jQuery('#pingresult')[0].html(data);
+            //alert('Load was performed.');
+        }
+    });
+}
+
+function set_connect_method(obj){
+    jQuery("#cr_ping_connection_method_selected")[0].value = obj.value;
+}
+</script><?php
+}
+
 add_action('save_post', 'cr_post_2_pingfm_save_postdata');
-
-//add_action('admin_menu', 'cr_flexible_comment_moderation_add_custom_box');
-//add_action('save_post', 'cr_flexible_comment_moderation_save_postdata');
-
 function cr_post_2_pingfm_save_postdata( $post_id ) {
 	// verify this came from the our screen and with proper authorization,
 	// because save_post can be triggered at other times
@@ -51,7 +120,7 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
 {
     $continue = false;
     $categories = array();
-    $postMode = get_option('cl_post_pingfm_publish_mode', false);
+    $postMode = get_option('cl_post_pingfm_publish_mode', 'once');
     $republish = false;
 
     if(!wp_is_post_revision($postId))
@@ -83,8 +152,9 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
         
         if($continue)
         {
+            $ping_template_mode = get_option('cr_post_pingfm_template_mode', 'global');
             update_option('cr_post_2_pingfm_submit_post_submitted_'.$postId, true);
-            submitPingFM($postId, $republish);
+            submitPingFM($postId, $republish, $ping_template_mode);
         }
     }
 }
@@ -92,7 +162,9 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
 
 function cr_post_2_pingfm_submit_config_admin()
 {
-	add_options_page('CR Post2Pingfm', 'CR Post2Pingfm', 8, __FILE__, 'cr_post_2_pingfm_submit_config_form');
+	//add_options_page('CR Post2Pingfm', 'CR Post2Pingfm', 8, __FILE__, 'cr_post_2_pingfm_submit_config_form');
+    add_menu_page( 'Post2Pingfm', 'Post2Pingfm', 8, 'cr_post_2_pingfm_submit_config_form', 'cr_post_2_pingfm_submit_config_form');
+    add_submenu_page( 'cr_post_2_pingfm_submit_config_form', 'Post2Pingfm', 'Test Connection', 8, 'cr_post_2_pingfm_ping_test_form', 'cr_post_2_pingfm_ping_test_form');
 	add_meta_box( 'cr_post_2_pingfm_custom_message_box', 'PingFM Message', 
 		'cr_post_2_pingfm_custom_message_box', 'post', 'side' );
 	add_meta_box( 'cr_post_2_pingfm_custom_message_box', 'PingFM Message', 
@@ -133,92 +205,19 @@ eg: <em>I just post {title} on {url}</em><br /></p>';
 }
 
 function cr_post_2_pingfm_submit_config_form() {
-?><div class="wrap">
-<h2>CR Post2Pingfm</h2>
-
-<form method="post" action="options.php">
-<?php wp_nonce_field('update-options'); ?>
-
-<table class="form-table">
-
-<tr valign="top">
-<th scope="row">Ping.fm Application Key</th>
-<td><input type="text" size="45" name="cl_post_pingfm_api_key" value="<?php echo get_option('cl_post_pingfm_api_key'); ?>" /></td>
-</tr>
-
-<tr valign="top">
-<th scope="row">Ping Template</th>
-<td>
-<input type="text" size="45" name="cl_post_pingfm_message_template_1" value="<?php echo get_option('cl_post_pingfm_message_template_1', 'I just post {title} on {url}'); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_2" value="<?php echo get_option('cl_post_pingfm_message_template_2', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_3" value="<?php echo get_option('cl_post_pingfm_message_template_3', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_4" value="<?php echo get_option('cl_post_pingfm_message_template_4', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_5" value="<?php echo get_option('cl_post_pingfm_message_template_5', 'New blog post {title} here: {url}'); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_6" value="<?php echo get_option('cl_post_pingfm_message_template_6', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_7" value="<?php echo get_option('cl_post_pingfm_message_template_7', 'Check out new post about {title} {url} here'); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_8" value="<?php echo get_option('cl_post_pingfm_message_template_8', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_9" value="<?php echo get_option('cl_post_pingfm_message_template_9', ''); ?>" /><br />
-<input type="text" size="45" name="cl_post_pingfm_message_template_10" value="<?php echo get_option('cl_post_pingfm_message_template_10', ''); ?>" /><br />
-
-Template Tags: <strong>{title}</strong> for <em>Post Title</em> and <strong>{url}</strong> for <em>Permalink URL</em> <br />
-eg: <em>I just post {title} on {url}</em></td>
-</tr>
-
-<tr valign="top">
-<th scope="row">Ping mode</th>
-<td>
-    Allow submit new post to ping.fm: <br />
-    <input type="radio" name="cl_post_pingfm_ping_mode" value="all" <?php if(get_option('cl_post_pingfm_ping_mode') == "all") { echo 'checked="checked"'; }?> />For all categories (<em>all</em>)<br />
-    <input type="radio" name="cl_post_pingfm_ping_mode" value="allow" <?php if(get_option('cl_post_pingfm_ping_mode') == "allow") { echo 'checked="checked"'; }?> />For this categories (<em>allow</em>)<br />
-    <input type="radio" name="cl_post_pingfm_ping_mode" value="deny" <?php if(get_option('cl_post_pingfm_ping_mode') == "deny") { echo 'checked="checked"'; }?> />For categories except this one (<em>deny</em>)<br />
-    Category list (<em>category ID and slug is supported</em>)<input type="text" name="cl_post_pingfm_ping_mode_category" value="<?php echo get_option('cl_post_pingfm_ping_mode_category'); ?>" />(comma separated, eg: <em>1,23,random-caregory,10,rants</em>)<br />
-    Category list is ignored if mode <em>all</em> is selected.
-</td>
-</tr>
-
-<tr valign="top">
-<th score="row">Publish mode</th>
-<td>
-    Allow submit to ping.fm on the following condition: <br />
-    <input type="radio" name="cl_post_pingfm_publish_mode" value="once" <?php if(get_option('cl_post_pingfm_publish_mode') == "once") { echo 'checked="checked"'; }?> />Only submit for the <strong>first time</strong>(<em>once</em>)<br />
-    <input type="radio" name="cl_post_pingfm_publish_mode" value="all" <?php if(get_option('cl_post_pingfm_publish_mode') == "all") { echo 'checked="checked"'; }?> />For everytime you push <strong>publish</strong> button(<em>all</em>)<br />
-</td>
-</tr>
-
-<tr valign="top">
-<th score="row">Re-Publish template</th>
-<td>
-    This option only used if you choose <em>all</em> in <strong>publish mode</strong>.<br />
-    <input type="radio" name="cl_post_pingfm_republish_template" value="above" <?php if(get_option('cl_post_pingfm_republish_template', 'above') == "above") { echo 'checked="checked"'; }?> />Use Ping Template above<br />
-    <input type="radio" name="cl_post_pingfm_republish_template" value="this" <?php if(get_option('cl_post_pingfm_republish_template') == "this") { echo 'checked="checked"'; }?> />Use this template
-    <input type="text" size="45" name="cl_post_pingfm_ping_republish_template_text" value="<?php echo get_option('cl_post_pingfm_ping_republish_template_text', 'republished {title} on {url}'); ?>" /><br />
-    The above template tags, apply.
-</td>
-</tr>
-</table>
-
-<input type="hidden" name="action" value="update" />
-<input type="hidden" name="page_options" value="cl_post_pingfm_message_template,cl_post_pingfm_api_key,cl_post_pingfm_ping_mode_category,
-cl_post_pingfm_ping_mode,cl_post_pingfm_publish_mode,cl_post_pingfm_ping_republish_template_text,cl_post_pingfm_republish_template,
-cl_post_pingfm_message_template_1,cl_post_pingfm_message_template_2,cl_post_pingfm_message_template_3,cl_post_pingfm_message_template_4,cl_post_pingfm_message_template_5,
-cl_post_pingfm_message_template_6,cl_post_pingfm_message_template_7,cl_post_pingfm_message_template_8,cl_post_pingfm_message_template_9,cl_post_pingfm_message_template_10" />
-
-<p class="submit">
-<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-</p>
-
-</form>
-</div><?php
+    include_once('admin_form_menu.php');
 }
 
-function submitPingFM($postId, $republish = false)
+function cr_post_2_pingfm_ping_test_form(){
+    include_once('admin_ping_test_form.php');
+}
+function submitPingFM($postId, $republish = false, $ping_template_mode = 'global')
 {
 	$post = get_post($postId);
-	include_once('PHPingFM.php');
 	$my_API_key = get_option('cl_post_pingfm_api_key');
 	$ping_template = get_post_meta( $postId, '_cr_post_2_pingfm_custom_message', true);
 	if(trim($ping_template) == ''){
-		$ping_template = getPingTemplate();
+		$ping_template = getPingTemplate($post, $ping_template_mode);
 	}
 	$cl_post_pingfm_republish_template = get_option('cl_post_pingfm_republish_template');
 
@@ -231,7 +230,6 @@ function submitPingFM($postId, $republish = false)
 	}
 
 
-	$pfm = new PHPingFM(API_KEY, $my_API_key, false);
 	$arrTemplate = array(
 		'{title}' => $post->post_title,
 		'{url}' => get_permalink($postId),
@@ -242,7 +240,19 @@ function submitPingFM($postId, $republish = false)
 		$ping_template = str_replace($template, $template_data, $ping_template);
 	}
 
-	$result = $pfm->post("status", $ping_template);
+	//$result = $pfm->post("status", $ping_template);
+    $cr_ping_connection_method = get_option('cr_ping_connection_method');
+    if('curl' == $cr_ping_connection_method){
+        require_once('curl_submitter.php');
+        //echo "cr_post2pingfm_do_submit_ping(".API_KEY.", $my_API_key, $ping_template, false);\n";
+        $message = cr_post2pingfm_do_submit_ping(API_KEY, $my_API_key, $ping_template, false);
+    }else if('fsockopen' == $cr_ping_connection_method){
+        require_once('fsockopen_submitter.php');
+        //echo "cr_post2pingfm_do_submit_ping(".API_KEY.", $my_API_key, $ping_template, false);\n";
+        $message = cr_post2pingfm_do_submit_ping(API_KEY, $my_API_key, $ping_template, false);
+    }
+    
+    
 }
 
 function isCategoriesAllowedToPing($postId, $categories)
@@ -279,8 +289,8 @@ function isCategoriesAllowedToPing($postId, $categories)
     }
 }
 
-function getPingTemplate(){
-	$template = array();
+function getPingTemplate($post, $ping_template_mode){
+	$template = $templateX = array();
 	
 	for($i = 1; $i <=10; $i++){
 		$x = trim(get_option('cl_post_pingfm_message_template_' . $i, ''));
@@ -289,10 +299,50 @@ function getPingTemplate(){
 		}
 	}
 	
+    $postcats = wp_get_object_terms($post->ID, 'category');
+    //print_r($postcats);
+    foreach($postcats as $cat){
+    	for($i = 1; $i <=5; $i++){
+    		$x = trim(get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_' . $i, ''));
+    		if($x !== ''){
+    			$templateX[] = $x;
+    		}
+    	}
+     }
+     
+     if(!empty($templateX) && ('category' == $ping_template_mode)){
+        $template = $templateX;        
+     }
+	
 	//print_r($template);
 	
 	return $template[ rand(0, count($template) - 1 ) ];
 }
 
+function cr_post_2_pingfm_edit_category_form_fields($cat){
+?>
+        <tr class="form-field">
+			<th scope="row" valign="top"><label for="ping_template_1">Ping.FM template</label></th>
+			<td scope="row" valign="top"><table><tr>
+<td><?php //echo $cat->term_id; ?>
+<input type="text" size="45" name="cl_post_pingfm_message_template_1" value="<?php echo get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_1', '') ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_2" value="<?php echo get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_2', '') ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_3" value="<?php echo get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_3', '') ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_4" value="<?php echo get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_4', '') ?>" /><br />
+<input type="text" size="45" name="cl_post_pingfm_message_template_5" value="<?php echo get_option('cr_post_2_pingfm_category_' . $cat->term_id . '_5', '') ?>" /><br />
+<p class="description">Template Tags: <strong>{title}</strong> for <em>Post Title</em> and <strong>{url}</strong> for <em>Permalink URL</em> <br />
+eg: <em>I just post {title} on {url}</em></p></td>
+</tr>
+</table></td>
+		</tr>
+<?php
+}
 
+function cr_post_2_pingfm_edit_category_save_action($cat_id){
+    update_option('cr_post_2_pingfm_category_' . $cat_id . '_1', $_POST['cl_post_pingfm_message_template_1']);
+    update_option('cr_post_2_pingfm_category_' . $cat_id . '_2', $_POST['cl_post_pingfm_message_template_2']);
+    update_option('cr_post_2_pingfm_category_' . $cat_id . '_3', $_POST['cl_post_pingfm_message_template_3']);
+    update_option('cr_post_2_pingfm_category_' . $cat_id . '_4', $_POST['cl_post_pingfm_message_template_4']);
+    update_option('cr_post_2_pingfm_category_' . $cat_id . '_5', $_POST['cl_post_pingfm_message_template_5']);
+}
 

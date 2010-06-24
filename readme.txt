@@ -4,7 +4,7 @@ Donate link: http://bayu.freelancer.web.id/about/
 Tags: publish, ping.fm
 Requires at least: 2.9.2
 Tested up to: 3.0
-Stable tag: 0.10
+Stable tag: 1.0
 
 a wordpress plugin that will automatically post an update to ping.fm for every publish.
 
@@ -12,8 +12,9 @@ a wordpress plugin that will automatically post an update to ping.fm for every p
 
 **NEW FEATURE IN THIS RELEASE**
 
-1. You can now set custom ping message for each post. Just look at "PingFM Message" panel on "Add New" post page.
-1. Fix PingFM library, force it to use HTTP 1.0. To workaround invalid XML on some server.
+1. You can now set custom ping status update for each category
+1. You will have the ability to set what connection method you want to use.
+1. There is tool to check what connection method is supported on your server.
 
 This is a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
 Features:
@@ -24,6 +25,11 @@ Features:
 1. Disable ping on selected categories
 1. Option to allow ping for everytime you hit "publish" button, or just the first publish of that particular post
 1. Option to differentiate wording on second publish (based on above option)
+1. Ability to set custom ping message for each post. Just look at "PingFM Message" panel on "Add New" post page.
+1. Ability to set custom ping status for each category.
+1. Ability to choose between CURL or FSockOpen connection method.
+1. Ability to test which connection method is supported on each server.
+
 
 == Installation ==
 

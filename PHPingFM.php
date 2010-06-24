@@ -56,7 +56,7 @@ class PHPingFM {
     $this->ch = curl_init();
     curl_setopt_array($this->ch, array(
       CURLOPT_CONNECTTIMEOUT => 2,
-      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_RETURNTRANSFER => !$this->debug,
       CURLOPT_POST => TRUE,
       CURLOPT_USERAGENT => 'PHPingFM 0.1',
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0,
@@ -97,14 +97,21 @@ class PHPingFM {
       return array('status' => FALSE);
     }
     // Setup the cURL options.
+    $fields = $fields + array('user_app_key' => $this->user_app_key, 'api_key' => $this->api_key);
     curl_setopt_array($this->ch, array(
-      CURLOPT_POSTFIELDS => $fields + array('user_app_key' => $this->user_app_key, 'api_key' => $this->api_key),
+      CURLOPT_POSTFIELDS => $fields,
       CURLOPT_URL => 'http://api.ping.fm/v1/'. $service,
     ));
+		if($this->debug)
+		{
+			echo print_r($fields, true) . "\n";
+			curl_setopt($this->ch, CURLOPT_HEADER, true);
+			curl_setopt($this->ch, CURLOPT_VERBOSE, true);
+		}
     // Load the SimpleXML.
-	$rawXML = curl_exec($this->ch);
-	if($this->debug)
-		echo "$rawXML";
+		$rawXML = curl_exec($this->ch);
+		if($this->debug)
+			echo "\n====\n\n$rawXML\n\n====\n";
     $xml = simplexml_load_string($rawXML);
     // Check the status.
     $status = ($xml['status'] == 'OK');
