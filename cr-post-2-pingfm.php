@@ -163,7 +163,8 @@ function cr_post_2_pingfm_submit_to_ping_fm($postId)
 function cr_post_2_pingfm_submit_config_admin()
 {
 	//add_options_page('CR Post2Pingfm', 'CR Post2Pingfm', 8, __FILE__, 'cr_post_2_pingfm_submit_config_form');
-    add_menu_page( 'Post2Pingfm', 'Post2Pingfm', 8, 'cr_post_2_pingfm_submit_config_form', 'cr_post_2_pingfm_submit_config_form');
+    add_menu_page( 'Post2Pingfm', 'Post2PingFM', 8, 'cr_post_2_pingfm_submit_config_form');
+    add_submenu_page( 'cr_post_2_pingfm_submit_config_form', 'Post2Pingfm', 'Configurations', 8, 'cr_post_2_pingfm_submit_config_form', 'cr_post_2_pingfm_submit_config_form');
     add_submenu_page( 'cr_post_2_pingfm_submit_config_form', 'Post2Pingfm', 'Test Connection', 8, 'cr_post_2_pingfm_ping_test_form', 'cr_post_2_pingfm_ping_test_form');
 	add_meta_box( 'cr_post_2_pingfm_custom_message_box', 'PingFM Message', 
 		'cr_post_2_pingfm_custom_message_box', 'post', 'side' );

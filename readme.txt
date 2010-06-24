@@ -15,6 +15,7 @@ a wordpress plugin that will automatically post an update to ping.fm for every p
 1. You can now set custom ping status update for each category
 1. You will have the ability to set what connection method you want to use.
 1. There is tool to check what connection method is supported on your server.
+1. My plugin will retry 10 times in case there's no response from server.
 
 This is a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
 Features:
@@ -55,4 +56,4 @@ Maybe there's something wrong with your server configurations. Note: You need PH
 == Screenshots ==
 
 1. This is where you fill in the Application Key. Image courtesy of http://www.dragonblogger.com/
-2. This is where you set custome ping message. It's on post creation page.
+2. This is where you set custom ping message. It's on post creation page.
