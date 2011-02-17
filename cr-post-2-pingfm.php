@@ -3,7 +3,7 @@
 Plugin Name: CR Post to Ping.fm
 Plugin URI: http://bayu.freelancer.web.id/oss/crpost2pingfm-plugin-to-submit-updates-to-ping-fm/
 Description: This plugin will submit your new post to ping.fm account.
-Version: 1.0
+Version: 1.0.1
 Author: Arief Bayu Purwanto
 Author URI: http://bayu.freelancer.web.id/
 */
@@ -109,7 +109,11 @@ function cr_post_2_pingfm_save_postdata( $post_id ) {
 	if(!add_post_meta($post_id, "_cr_post_2_pingfm_custom_message", $cr_p2pcm, true))
 		update_post_meta($post_id, "_cr_post_2_pingfm_custom_message", $cr_p2pcm);
 
-	$cr_p2pcm_send_on_update = $_POST['cr_post_2_pingfm_custom_message_send_on_update'];
+	$cr_p2pdptp = $_POST['_cr_post_2_pingfm_dont_ping_this_post'];
+	if(!add_post_meta($post_id, "_cr_post_2_pingfm_dont_ping_this_post", $cr_p2pdptp, true))
+		update_post_meta($post_id, "_cr_post_2_pingfm_dont_ping_this_post", $cr_p2pdptp);
+
+		$cr_p2pcm_send_on_update = $_POST['cr_post_2_pingfm_custom_message_send_on_update'];
 	if(!add_post_meta($post_id, "_cr_post_2_pingfm_custom_message_send_on_update", $cr_p2pcm_send_on_update, true))
 		update_post_meta($post_id, "_cr_post_2_pingfm_custom_message_send_on_update", $cr_p2pcm_send_on_update);
 
@@ -178,6 +182,7 @@ function cr_post_2_pingfm_custom_message_box() {
 
 	// The actual fields for data entry
 	$custom_message = get_post_meta( $post_id, '_cr_post_2_pingfm_custom_message', true);
+	$dont_ping_this_post = get_post_meta( $post_id, '_cr_post_2_pingfm_dont_ping_this_post', true);
 	$send_on_update = get_post_meta( $post_id, '_cr_post_2_pingfm_custom_message_send_on_update', true);
 	
 	echo '<input type="hidden" name="_cr_post_2_pingfm_custom_message_nonce" id="_cr_post_2_pingfm_custom_message_nonce" value="' . 
@@ -193,6 +198,10 @@ we will use setting provided on CR Post2PingFm setting page.<br />
 You can still use Template Tags: <strong>{title}</strong> for <em>Post Title</em>
 and <strong>{url}</strong> for <em>Permalink URL</em> <br />
 eg: <em>I just post {title} on {url}</em><br /></p>';
+	echo '<input type="checkbox"'
+		.' name="cr_post_2_pingfm_dont_ping_this_post"'
+		.' value="1"' . ($dont_ping_this_post ? '' : ' checke="checked"') . ' />';
+	echo '<label for="cr_post_2_pingfm_dont_ping_this_post">don\'t ping this post.</label><br />';
 /*	echo '<label for="cr_post_2_pingfm_custom_message_send_on_update">Send on update:</label><br />';
   echo '<input type="radio"'
   		.' name="cr_post_2_pingfm_custom_message_send_on_update"'
