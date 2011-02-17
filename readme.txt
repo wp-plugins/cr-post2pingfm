@@ -7,7 +7,7 @@ Tested up to: 3.0
 Stable tag: 1.0.1
 
 IMPORTANT: YOU CAN USE HELLOTXT INSTEAD OF PING.FM. BECAUSE THEY HAVE NO REAL PROGRESS ON IT.
-DOWNLOAD IT HERE: http://bayu.freelancer.web.id/2011/02/16/crpost2pingfm-plugin-ported-to-crhellotxtextended/
+DOWNLOAD IT HERE: http://bit.ly/crHelloTXTExtended  
 
 == Description ==
 
