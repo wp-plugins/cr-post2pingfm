@@ -4,18 +4,18 @@ Donate link: http://bayu.freelancer.web.id/about/
 Tags: publish, ping.fm
 Requires at least: 2.9.2
 Tested up to: 3.0
-Stable tag: 2.0
+Stable tag: 1.0.1
 
-a wordpress plugin that will automatically post an update to ping.fm for every publish.
+IMPORTANT: YOU CAN USE HELLOTXT INSTEAD OF PING.FM. BECAUSE THEY HAVE NO REAL PROGRESS ON IT.
+DOWNLOAD IT HERE: http://bayu.freelancer.web.id/2011/02/16/crpost2pingfm-plugin-ported-to-crhellotxtextended/
 
 == Description ==
 
 **NEW FEATURE IN THIS RELEASE**
 
-1. You can now set custom ping status update for each category
-1. You will have the ability to set what connection method you want to use.
-1. There is tool to check what connection method is supported on your server.
-1. My plugin will retry 10 times in case there's no response from server.
+IMPORTANT: YOU CAN USE HELLOTXT INSTEAD OF PING.FM. BECAUSE THEY HAVE NO REAL PROGRESS ON IT.
+DOWNLOAD IT HERE: http://bayu.freelancer.web.id/2011/02/16/crpost2pingfm-plugin-ported-to-crhellotxtextended/
+
 
 This is a wordpress plugin that will automatically post an update to [ping.fm](http://www.ping.fm/ "ping.fm") for every publish.
 Features:
@@ -30,7 +30,10 @@ Features:
 1. Ability to set custom ping status for each category.
 1. Ability to choose between CURL or FSockOpen connection method.
 1. Ability to test which connection method is supported on each server.
-
+1. You can now set custom ping status update for each category
+1. You will have the ability to set what connection method you want to use.
+1. There is tool to check what connection method is supported on your server.
+1. My plugin will retry 10 times in case there's no response from server.
 
 == Installation ==
 

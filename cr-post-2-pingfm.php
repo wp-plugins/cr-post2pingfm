@@ -3,7 +3,7 @@
 Plugin Name: CR Post to Ping.fm
 Plugin URI: http://bayu.freelancer.web.id/oss/crpost2pingfm-plugin-to-submit-updates-to-ping-fm/
 Description: This plugin will submit your new post to ping.fm account.
-Version: 1.0
+Version: 1.0.1
 Author: Arief Bayu Purwanto
 Author URI: http://bayu.freelancer.web.id/
 */
